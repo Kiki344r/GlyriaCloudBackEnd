@@ -1,0 +1,48 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  UUID      String @id @default(uuid(7))
+  firstName String
+  lastName  String
+  email     String @unique
+  password  String
+
+  // Groupes dont l'utilisateur est membre
+  groups Groups[] @relation("UserGroups")
+
+  // Groupes que l'utilisateur possède
+  ownedGroups Groups[] @relation("GroupOwner")
+}
+
+model Groups {
+  UUID String @id @default(uuid(7))
+  name String
+
+  // Owner du groupe
+  ownerId String
+  owner   Users  @relation("GroupOwner", fields: [ownerId], references: [UUID])
+
+  // Users membres
+  users     Users[]    @relation("UserGroups")
+  GroupCode GroupCode?
+}
+
+model GroupCode {
+  UUID    String @id @default(uuid(7))
+  code    String @unique // le code du groupe
+  group   Groups @relation(fields: [groupId], references: [UUID])
+  groupId String @unique // un code = un groupe
+}
