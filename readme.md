@@ -1,16 +1,14 @@
+## Dépendances / Repos liés
+- [Repo 1](https://github.com/Kiki344r/GlyriaCloudFrontEnd) : Frontend
+- [Repo 2](https://github.com/Kiki344r/GlyriaCloudBackEnd) : Backend
+
 # ENV LIST:
 
 ```
-DATABASE_URL="mysql://root:development@127.0.0.1:3306/Spock"
+DATABASE_URL="mysql://root:development@127.0.0.1:3306/GlyriaCloud"
 REDIS_URL="redis://:development@localhost:6379/0"
 
-REDIRECT_URI="http://localhost:3000/_LANG_/discord/callback"
-
 PORT="3100"
-
-DISCORD_TOKEN="DISCORD_BOT_TOKEN"
-CLIENT_SECRET="DISCORD_BOT_SECRET"
-CLIENT_ID="DISCORD_BOT_CLIENT_ID"
 
 JWT_SECRET="JWT_SECRET"
 ```
