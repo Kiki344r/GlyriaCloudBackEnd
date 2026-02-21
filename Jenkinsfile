@@ -43,8 +43,7 @@ pipeline {
         }
 
         stage('Notification Portainer') {
-            // Optionnel : décommente si tu as configuré ton Webhook Portainer
-            /*
+            /* Optionnel : décommente si tu as configuré ton Webhook Portainer
             steps {
                 withCredentials([string(credentialsId: 'PORTAINER_WEBHOOK_URL', variable: 'WEBHOOK')]) {
                     sh "curl -X POST ${WEBHOOK}"
