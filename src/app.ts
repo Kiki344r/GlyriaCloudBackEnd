@@ -41,22 +41,22 @@ export const server = app.listen(PORT, () => {
     console.log(`✅ API server running on port ${PORT}`);
 });
 
-const API_TOKEN = "PVEAPIToken=root@pam!glyria-cloud=d55d1528-0e9b-481a-8c55-17d8a8cf3de6"
+//const API_TOKEN = "PVEAPIToken=root@pam!glyria-cloud=d55d1528-0e9b-481a-8c55-17d8a8cf3de6"
 
-const SSH_CONFIG = {
+/*const SSH_CONFIG = {
     host: '192.168.1.125',
     port: 22,
     username: 'root', // À remplacer
     privateKey: require('fs').readFileSync('./src/id_ed25519')
-};
+};*/
 
-interface ResizeMessage {
+/*interface ResizeMessage {
     type: 'resize';
     cols: number;
     rows: number;
-}
+}*/
 
-const web_socket_server = new WebSocketServer({ noServer: true });
+/*const web_socket_server = new WebSocketServer({ noServer: true });
 //@ts-ignore
 const web_socket_handler = (ws: WebSocket) => {
     console.log('Nouvelle connexion WebSocket établie');
@@ -171,3 +171,4 @@ server.on('upgrade', (request, socket, head) => {
         web_socket_server.emit('connection', ws, request);
     });
 });
+*/
