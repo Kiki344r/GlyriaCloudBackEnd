@@ -1,19 +1,24 @@
 FROM node:22-alpine
 
-# Installation des dépendances système nécessaires
-RUN apk add --no-cache openssl
+# Installation des dépendances système + outils de build pour node-gyp (node-pty)
+RUN apk add --no-cache \
+    openssl \
+    python3 \
+    make \
+    g++ \
+    gcc
 
 WORKDIR /app
 
-# Copie des fichiers de conf + patchs
+# Copie des fichiers de conf
 COPY package*.json ./
 COPY tsconfig.json ./
 COPY prisma ./prisma
 
-# Installation des dépendances (postinstall lancera patch-package)
+# L'installation va maintenant réussir car node-gyp trouvera Python et le compilateur C++
 RUN npm install
 
-# Génération Prisma (patchs déjà appliqués si postinstall fonctionne)
+# Génération Prisma
 RUN npx prisma generate
 
 # Copie du code source
