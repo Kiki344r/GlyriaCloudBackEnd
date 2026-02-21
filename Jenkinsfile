@@ -43,15 +43,12 @@ pipeline {
         }
 
         stage('Notification Portainer') {
-            /* Optionnel : décommente si tu as configuré ton Webhook Portainer
-            steps {
-                withCredentials([string(credentialsId: 'PORTAINER_WEBHOOK_URL', variable: 'WEBHOOK')]) {
-                    sh "curl -X POST ${WEBHOOK}"
-                }
-            }
-            */
             steps {
                 echo "🔔 Notifier Portainer que la version ${env.APP_VERSION} est prête."
+
+                withCredentials([string(credentialsId: 'PORTAINER_WEBHOOK_URL_GLYRIA_CLOUD_BACKEND', variable: 'WEBHOOK')]) {
+                    sh "curl -X POST ${WEBHOOK}"
+                }
             }
         }
     }
