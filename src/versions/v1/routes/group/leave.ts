@@ -1,5 +1,5 @@
 import express, {Request, Response, NextFunction, Router} from 'express';
-import {verifyToken} from "@/routes/v1/middleware/verifyToken";
+import {verifyToken} from "@/versions/v1/middleware/verifyToken";
 import {prisma} from "@/config";
 
 const router: Router = express.Router();

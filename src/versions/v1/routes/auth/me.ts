@@ -1,5 +1,5 @@
 import express, {Request, Response, NextFunction, Router} from 'express';
-import {verifyToken} from "@/routes/v1/middleware/verifyToken";
+import {verifyToken} from "@/versions/v1/middleware/verifyToken";
 
 const router: Router = express.Router();
 
@@ -43,7 +43,7 @@ router.get('/admin', verifyToken, async function (req: Request, res: Response, n
         const admins = process.env.ADMINS || ""
 
         if (admins.includes(`?${JWT.userId}?`)) return res.status(200).json({})
-        else return res.status(403).json({success: false, message: "Unauthorized"})
+        else return res.status(403).json({success: false, message: "Vous n'êtes pas administrateur !"})
 
     } catch (e) {
         console.log(e)

@@ -2,7 +2,7 @@ import express, {Request, Response, NextFunction, Router} from 'express';
 
 const router: Router = express.Router();
 
-import {verifyToken} from "@/routes/v1/middleware/verifyToken";
+import {verifyToken} from "@/versions/v1/middleware/verifyToken";
 
 /* GET home page. */
 router.post('/', verifyToken, async function (req: Request, res: Response, next: NextFunction) {
