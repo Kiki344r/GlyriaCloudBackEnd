@@ -3,7 +3,7 @@ import {verifyToken} from "@/versions/v1/middleware/verifyToken";
 
 export default {
     method: "GET",
-    path: "/auth/me",
+    path: "/auth/me/admin",
     middlewares: [verifyToken],
     handler: async (req, res) => {
         try {
