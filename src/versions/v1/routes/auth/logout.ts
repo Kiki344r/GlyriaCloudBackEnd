@@ -1,22 +1,20 @@
-import express, {Request, Response, NextFunction, Router} from 'express';
-
-const router: Router = express.Router();
-
+import { RouteConfig} from "@/versions/routesManager";
 import {verifyToken} from "@/versions/v1/middleware/verifyToken";
 
-/* GET home page. */
-router.post('/', verifyToken, async function (req: Request, res: Response, next: NextFunction) {
+export default {
+    method: "POST",
+    path: "/auth/logout",
+    middlewares: [verifyToken],
+    handler: async (req, res) => {
+        try {
 
-    try {
+            res.clearCookie("token")
 
-        res.clearCookie("token")
+            return res.status(200).json({success: true})
 
-        return res.status(200).json({success: true})
-
-    } catch (e) {
-        console.log(e)
-        return res.status(500).json({success: false})
+        } catch (e) {
+            console.log(e)
+            res.status(500).json({success: false})
+        }
     }
-});
-
-export default router;
+} as RouteConfig;

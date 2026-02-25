@@ -8,14 +8,16 @@ export default {
     handler: async (req, res) => {
         try {
 
-            return res.status(200).json({
-                success: true,
-                data: req.userData ? req.userData : {}
-            })
+            const {UUID} = req.userData!
+
+            const admins = process.env.ADMINS || ""
+
+            if (admins.includes(`?${UUID}?`)) return res.status(200).json({})
+            else return res.status(403).json({success: false, message: "Vous n'êtes pas administrateur !"})
 
         } catch (e) {
             console.log(e)
-            res.status(500).json({success: false, message: "Une erreur est survenue !"})
+            res.status(500).json({success: false})
         }
     }
 } as RouteConfig;

@@ -1,69 +1,68 @@
-import express, {Request, Response, NextFunction, Router} from 'express';
+import { RouteConfig} from "@/versions/routesManager";
 import {verifyToken} from "@/versions/v1/middleware/verifyToken";
 import {prisma} from "@/config";
 
-const router: Router = express.Router();
-const jwt = require("jsonwebtoken")
+export default {
+    method: "DELETE",
+    path: "/group/leave",
+    middlewares: [verifyToken],
+    handler: async (req, res) => {
+        try {
 
-/* GET home page. */
-router.delete('/', verifyToken, async function (req: Request, res: Response, next: NextFunction) {
-    try {
+            const {groupId} = req.body
 
-        const {groupId} = req.body
-
-        const groupCheck = await prisma.groups.findUnique({
-            where: {
-                UUID: groupId
-            },
-            select: {
-                UUID: true
-            }
-        })
+            const groupCheck = await prisma.groups.findUnique({
+                where: {
+                    UUID: groupId
+                },
+                select: {
+                    UUID: true
+                }
+            })
 
 
-        if (!groupCheck) return res.status(404).json({success: false, message: "Ce groupe n'existe pas !"})
+            if (!groupCheck) return res.status(404).json({success: false, message: "Ce groupe n'existe pas !"})
 
-        const {email} = await jwt.verify(req.cookies.token, process.env.JWT_SECRET)
+            const {email} = req.userData!
 
-        const userGroup = await prisma.users.findUnique({
-            where: {
-                email: email
-            },
-            select: {
-                groups: {
-                    where: {
-                        UUID: groupCheck.UUID
+            const userGroup = await prisma.users.findUnique({
+                where: {
+                    email: email
+                },
+                select: {
+                    groups: {
+                        where: {
+                            UUID: groupCheck.UUID
+                        }
                     }
                 }
-            }
-        })
+            })
 
-        if (userGroup && userGroup.groups.length < 1) return res.status(409).json({
-            success: false,
-            message: "Vous ne faites pas partie de ce groupe !"
-        })
+            if (userGroup && userGroup.groups.length < 1) return res.status(409).json({
+                success: false,
+                message: "Vous ne faites pas partie de ce groupe !"
+            })
 
-        await prisma.users.update({
-            where: {
-                email: email
-            },
-            data: {
-                groups: {
-                    disconnect: {
-                        UUID: groupCheck.UUID
+            await prisma.users.update({
+                where: {
+                    email: email
+                },
+                data: {
+                    groups: {
+                        disconnect: {
+                            UUID: groupCheck.UUID
+                        }
                     }
                 }
-            }
-        })
+            })
 
-        return res.status(200).json({
-            success: true, data: groupCheck.UUID
-        })
+            return res.status(200).json({
+                success: true, data: groupCheck.UUID
+            })
 
-    } catch (e) {
-        console.log(e)
-        return res.status(500).json({success: false})
+        } catch (e) {
+            console.log(e)
+            res.status(500).json({success: false})
+        }
     }
-});
-
-export default router;
+} as RouteConfig;

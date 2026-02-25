@@ -1,28 +1,24 @@
-import express, {Request, Response, NextFunction, Router} from 'express';
-import {verifyToken} from "@/versions/v1/middleware/verifyToken";
-
-const router: Router = express.Router();
+import { RouteConfig} from "@/versions/routesManager";
 
 const jwt = require("jsonwebtoken")
 
+export default {
+    method: "POST",
+    path: "/auth/forgot-password",
+    handler: async (req, res) => {
+        try {
 
-/* GET home page. */
-router.get('/', verifyToken, async function (req: Request, res: Response, next: NextFunction) {
+            const Token = req.cookies.token
 
-    try {
+            const JWT = await jwt.verify(Token, process.env.JWT_SECRET)
 
-        const Token = req.cookies.token
+            return res.status(200).json({
+                success: true
+            })
 
-        const JWT = await jwt.verify(Token, process.env.JWT_SECRET)
-
-        return res.status(200).json({
-            success: true
-        })
-
-    } catch (e) {
-        console.log(e)
-        return res.status(500).json({success: false, message: "Une erreur est survenue !"})
+        } catch (e) {
+            console.log(e)
+            res.status(500).json({success: false, message: "Une erreur est survenue !"})
+        }
     }
-});
-
-export default router;
+} as RouteConfig;
