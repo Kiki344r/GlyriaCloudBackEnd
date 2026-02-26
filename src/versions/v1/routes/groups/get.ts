@@ -11,6 +11,8 @@ export default {
 
             const {email} = req.userData!
 
+            if (!email) return res.status(404).json({success: false, message: "Cet utilisateur n'existe pas !"})
+
             const user = await prisma.users.findUnique({
                 where: {
                     email: email

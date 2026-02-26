@@ -11,7 +11,7 @@ export default {
         try {
 
             if (req?.cookies?.token) return res.status(409).json({success: false, message: "Vous êtes déjà connecter !"})
-            console.log(req.body)
+
             const {email, password, remember} = req.body
 
             if (!email || !password) return res.status(400).json({success: false, message: "Des champs sont manquants !"})

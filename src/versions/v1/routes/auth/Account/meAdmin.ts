@@ -10,6 +10,8 @@ export default {
 
             const {UUID} = req.userData!
 
+            if (!UUID) return res.status(404).json({success: false, message: "Cet utilisateur n'existe pas !"})
+
             const admins = process.env.ADMINS || ""
 
             if (admins.includes(`?${UUID}?`)) return res.status(200).json({})

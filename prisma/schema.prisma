@@ -24,7 +24,17 @@ model Users {
   groups Groups[] @relation("UserGroups")
 
   // Groupes que l'utilisateur possède
-  ownedGroups Groups[] @relation("GroupOwner")
+  ownedGroups    Groups[]         @relation("GroupOwner")
+  forgotPassword forgotPassword[] @relation("UserEmail")
+}
+
+model forgotPassword {
+  UUID      String   @id @default(uuid(7))
+  createdAt DateTime @default(now())
+  expireAt  DateTime
+
+  userEmail String
+  user      Users  @relation("UserEmail", fields: [userEmail], references: [email])
 }
 
 model Groups {

@@ -1,5 +1,5 @@
 // resetPasswordEmail.ts
-export default (username: string, resetLink: string) => `
+export default (username: string, connectLink: string) => `
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -23,8 +23,8 @@ export default (username: string, resetLink: string) => `
           <tr>
             <td style="padding: 40px 30px;">
               <!-- Title -->
-              <h1 style="margin: 0 0 15px 0; font-size: 28px; font-weight: 700; text-align: center; color: #6366f1; letter-spacing: -0.5px;">
-                Réinitialisation de mot de passe
+              <h1 style="margin: 0 0 15px 0; font-size: 28px; font-weight: 700; text-align: center; color: #10b981; letter-spacing: -0.5px;">
+                ✓ Mot de passe réinitialisé
               </h1>
               
               <!-- Intro text -->
@@ -33,34 +33,30 @@ export default (username: string, resetLink: string) => `
               </p>
               
               <p style="margin: 0 0 30px 0; font-size: 15px; line-height: 1.6; color: #d1d5db;">
-                Nous avons reçu une demande de réinitialisation de votre mot de passe. Cliquez sur le bouton ci-dessous pour créer un nouveau mot de passe.
+                Votre mot de passe a été <strong style="color: #10b981;">réinitialisé avec succès</strong>. Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.
               </p>
               
-              <!-- CTA Button -->
-              <table role="presentation" style="margin: 35px auto; border-collapse: collapse;" cellpadding="0" cellspacing="0">
+              <!-- Success Info Box -->
+              <table role="presentation" style="margin: 35px auto; border-collapse: collapse; width: 100%;" cellpadding="0" cellspacing="0">
                 <tr>
-                  <td style="border-radius: 8px; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);">
-                    <a href="${resetLink}" style="display: block; padding: 14px 40px; font-size: 16px; font-weight: 600; color: #fff; text-decoration: none; border-radius: 8px; transition: all 0.3s ease;" target="_blank">
-                      Réinitialiser mon mot de passe
-                    </a>
+                  <td style="padding: 20px; background: linear-gradient(135deg, #10b98133 0%, #34d39933 100%); border-left: 4px solid #10b981; border-radius: 6px; text-align: center;">
+                    <p style="margin: 0; font-size: 15px; color: #d1d5db;">
+                      <strong style="color: #10b981; font-size: 18px;">✓</strong> Votre compte est sécurisé
+                    </p>
                   </td>
                 </tr>
               </table>
               
               <!-- Security Info -->
-              <p style="margin: 30px 0; padding: 15px; background-color: #1f2937; border-left: 4px solid #6366f1; border-radius: 4px; font-size: 14px; line-height: 1.6; color: #d1d5db;">
-                <strong style="color: #f9fafb;">⚠️ Lien temporaire:</strong> Ce lien expirera dans 30 minutes. Ne le partagez avec personne.
+              <p style="margin: 30px 0; padding: 15px; background-color: #1f2937; border-left: 4px solid #f59e0b; border-radius: 4px; font-size: 14px; line-height: 1.6; color: #d1d5db;">
+                <strong style="color: #f9fafb;">⚠️ Important:</strong> Si vous n'avez pas demandé cette réinitialisation, contactez immédiatement notre support. Quelqu'un d'autre pourrait avoir accès à votre compte.
               </p>
               
-              <!-- Alternative Link -->
-              <p style="margin: 25px 0; font-size: 13px; text-align: center; color: #9ca3af;">
-                Ou copiez ce lien dans votre navigateur:<br/>
-                <span style="word-break: break-all; color: #6366f1; font-family: 'Courier New', monospace;">${resetLink}</span>
-              </p>
-              
-              <!-- Not requested -->
-              <p style="margin: 30px 0 0 0; padding: 15px; background-color: rgba(100, 116, 139, 0.3); border-radius: 6px; font-size: 14px; line-height: 1.6; text-align: center; color: #cbd5e1;">
-                Si vous n'avez pas demandé cette réinitialisation, vous pouvez ignorer cet email en toute sécurité. Votre compte restera protégé.
+              <!-- Action Link -->
+              <p style="margin: 25px 0; text-align: center;">
+                <a href="${connectLink}" style="display: inline-block; padding: 12px 30px; font-size: 15px; font-weight: 600; color: #fff; text-decoration: none; border-radius: 8px; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4); transition: all 0.3s ease;" target="_blank">
+                  Se connecter à mon compte
+                </a>
               </p>
             </td>
           </tr>

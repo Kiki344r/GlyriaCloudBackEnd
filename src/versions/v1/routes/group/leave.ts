@@ -11,6 +11,8 @@ export default {
 
             const {groupId} = req.body
 
+            if (!groupId) return res.status(400).json({success: false, message: "Des champs sont manquants !"})
+
             const groupCheck = await prisma.groups.findUnique({
                 where: {
                     UUID: groupId

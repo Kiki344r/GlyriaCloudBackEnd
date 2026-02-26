@@ -11,6 +11,8 @@ export default {
 
             const {code} = req.body
 
+            if (!code) return res.status(400).json({success: false, message: "Des champs sont manquants !"})
+
             const codeCheck = await prisma.groupCode.findUnique({
                 where: {
                     code: code
