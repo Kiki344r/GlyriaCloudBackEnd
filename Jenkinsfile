@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'PC_Lycee' }
+    agent { label 'any' }
 
     environment {
         // --- CONFIGURATION ---
