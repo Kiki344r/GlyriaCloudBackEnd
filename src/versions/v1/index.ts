@@ -32,27 +32,6 @@ router.use("/auth", AuthRoute)
 router.use("/group", GroupRoute)
 router.use("/groups", GroupsRoute)
 
-import RegisterRoute from "./auth/register"
-AuthRoute.use("/register", RegisterRoute)
-
-import LoginRoute from "./auth/login"
-AuthRoute.use("/login", LoginRoute)
-
-import LogoutRoute from "./auth/logout"
-AuthRoute.use("/logout", LogoutRoute)
-
-import MeRoute from "./auth/me"
-AuthRoute.use("/me", MeRoute)
-
-import JoinRoute from "./group/join"
-GroupRoute.use("/join", JoinRoute)
-
-import LeaveRoute from "./group/leave"
-GroupRoute.use("/leave", LeaveRoute)
-
-import GetGroupsRoute from "./groups/get"
-GroupsRoute.use("/get", GetGroupsRoute)
-
 const PROXMOX_URL = 'https://192.168.1.96:8006/api2/json'
 
 const proxmoxApi = axios.create({

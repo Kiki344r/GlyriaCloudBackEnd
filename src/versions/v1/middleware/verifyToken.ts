@@ -35,29 +35,8 @@ export async function verifyToken(req: Request, res: Response, next: NextFunctio
         if (JWT === false) return
 
         if (JWT) {
-            if (JWT?.expireAt <= Date.now()) {
-
-                /*const JWT_Token = await jwt.sign({
-                    userId: JWT.id,
-                    username: JWT.username,
-                    global_name: JWT.global_name,
-                    avatar: JWT.avatar,
-                    email: JWT.email,
-                    refreshToken: TokenRequest.refresh_token,
-                    accessToken: TokenRequest.access_token,
-                    redirectURI: JWT.redirectURI,
-                    expireAt: Date.now() + TokenRequest.expires_in * 1000
-                })*/
-
-                //res.cookie("token", JWT_Token)
-                //req.cookies.token = JWT_Token
-
-                next()
-
-            } else {
-                next()
-            }
-
+            req.userData = JWT
+            next()
         } else {
             return res.status(401).json({ success: false, message: "Vous n'êtes pas connecté !"})
         }
