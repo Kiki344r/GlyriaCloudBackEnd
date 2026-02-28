@@ -6,8 +6,6 @@ pipeline {
         DOCKER_USER  = 'kiki344r'
         IMAGE_NAME   = 'glyria-cloud-backend'
         REGISTRY_ID  = 'docker-hub-creds'
-        // On récupère le Tag Git s'il existe, sinon on utilise le Build Number
-        APP_VERSION  = sh(script: "git describe --tags --exact-match HEAD || echo ${env.BUILD_NUMBER}", returnStdout: true).trim()
     }
 
     stages {
@@ -16,6 +14,10 @@ pipeline {
                 echo "🚀 Démarrage du build version: ${env.APP_VERSION}"
                 deleteDir()
                 checkout scm
+                script {
+                    env.APP_VERSION = sh(script: "git describe --tags --exact-match HEAD || echo build-${env.BUILD_NUMBER}", returnStdout: true).trim()
+                }
+                echo "📌 Version déterminée : ${env.APP_VERSION}"
             }
         }
 
