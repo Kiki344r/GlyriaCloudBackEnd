@@ -34,7 +34,7 @@ export function registerRoutes(router: Router, routesDir: string) {
                             : [routeConfig.handler];
 
                         router[method](routeConfig.path, ...handlers);
-                        console.log(`✓ Route enregistrée: ${routeConfig.method} ${routeConfig.path}`);
+                        //console.log(`✓ Route enregistrée: ${routeConfig.method} ${routeConfig.path}`);
                     }
                 } catch (error) {
                     console.error(`Erreur lors du chargement de ${fullPath}:`, error);

@@ -2,6 +2,9 @@ import { RouteConfig} from "@/versions/routesManager";
 import {verifyToken} from "@/versions/v1/middleware/verifyToken";
 import {prisma} from "@/config";
 
+import {useGroups} from "@/versions/v1/services";
+const {checkGroupCode} = useGroups()
+
 export default {
     method: "POST",
     path: "/group/join",
@@ -27,7 +30,7 @@ export default {
 
             if (!codeCheck) return res.status(404).json({success: false, message: "Ce code n'existe pas !"})
 
-            const {email} = req.userData!
+            const {email, UUID: userId} = req.userData!
 
             const userGroup = await prisma.users.findUnique({
                 where: {
@@ -36,7 +39,7 @@ export default {
                 select: {
                     groups: {
                         where: {
-                            UUID: codeCheck.groupId
+                            groupId: codeCheck.groupId
                         }
                     }
                 }
@@ -47,16 +50,10 @@ export default {
                 message: "Vous faites déjà partie de ce groupe !"
             })
 
-            await prisma.users.update({
-                where: {
-                    email: email
-                },
+            await prisma.userGroupPermissions.create({
                 data: {
-                    groups: {
-                        connect: {
-                            UUID: codeCheck.groupId
-                        }
-                    }
+                    userId: userId,
+                    groupId: codeCheck.groupId
                 }
             })
 

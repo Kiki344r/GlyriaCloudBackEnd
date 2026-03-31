@@ -1,6 +1,9 @@
 import { RouteConfig} from "@/versions/routesManager";
 import {verifyToken} from "@/versions/v1/middleware/verifyToken";
 
+import {useAccount} from "@/versions/v1/services";
+const {getUserInfoCached} = useAccount()
+
 export default {
     method: "GET",
     path: "/auth/me",
@@ -8,9 +11,13 @@ export default {
     handler: async (req, res) => {
         try {
 
+            const {email} = req.userData!
+
+            const userData = await getUserInfoCached(email)
+
             return res.status(200).json({
                 success: true,
-                data: req.userData ? req.userData : {}
+                data: userData
             })
 
         } catch (e) {

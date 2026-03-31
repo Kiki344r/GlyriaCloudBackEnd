@@ -1,6 +1,6 @@
 import { RouteConfig} from "@/versions/routesManager";
 import {prisma} from "@/config";
-import {transporter} from "@/versions/v1/services/mailer";
+import {useMailer} from "@/versions/v1/services";
 import resetPasswordMail from "@/versions/v1/template/mail/resetPassword"
 import bcrypt from "bcrypt";
 
@@ -14,13 +14,8 @@ export default {
 
             if (!code || !password) return res.status(400).json({success: false, message: "Des champs sont manquants !"})
 
-            const passwordCode = await prisma.forgotPassword.findUnique({where: {UUID: code}})
+            const passwordCode = await prisma.forgotPassword.findUnique({where: {UUID: code, expireAt: {gte: new Date()}}})
             if (!passwordCode) return res.status(404).json({success: false, message: "Ce code n'existe pas !"})
-
-            if (passwordCode.expireAt < new Date()) {
-                await prisma.forgotPassword.delete({where: {UUID: code}})
-                return res.status(410).json({success: false, message: 'Le lien de rénitialisation de mot de passe a expiré !'})
-            }
 
             if (password.length < 8) return res.status(422).json({success: false, message: "Le mot de passe est trop court !"})
 
@@ -38,11 +33,10 @@ export default {
             if (!user) return res.status(404).json({success: true, message: "Cet utilisateur n'existe pas !"})
             await prisma.forgotPassword.delete({where: {UUID: code}})
 
-            // envoyer mail
             const userFullName = `${user.firstName} ${user.lastName}`
 
             try {
-                await transporter.sendMail({
+                await useMailer.sendMail({
                     to: `${userFullName} <${user.email}>`,
                     from: `${process.env.SMTP_FROM} <${process.env.SMTP_FROM_EMAIL}>`,
                     subject: "Votre mot de passe a été réinitialisé",

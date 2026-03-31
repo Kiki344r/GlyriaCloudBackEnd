@@ -13,7 +13,7 @@ if (!process.env.SMTP_PASSWORD) {
     console.error("❌ SMTP_PASSWORD n'est pas défini dans les variables d'environnement");
 }
 
-const transporter = nodemailer.createTransport({
+const useMailer = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: port,
     // Port 587 utilise STARTTLS (secure: false), port 465 utilise SSL/TLS direct (secure: true)
@@ -29,4 +29,4 @@ const transporter = nodemailer.createTransport({
     }
 })
 
-export { transporter }
+export { useMailer }

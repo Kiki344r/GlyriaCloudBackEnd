@@ -1,6 +1,6 @@
 import { RouteConfig} from "@/versions/routesManager";
 import {prisma} from "@/config";
-import {transporter} from "@/versions/v1/services/mailer";
+import {useMailer} from "@/versions/v1/services";
 import forgotPasswordMail from "@/versions/v1/template/mail/forgotPassword"
 
 export default {
@@ -30,7 +30,7 @@ export default {
 
             const userFullName = `${user.firstName} ${user.lastName}`
 
-            await transporter.sendMail({
+            await useMailer.sendMail({
                 to: `${userFullName} <${email}>`,
                 from: `${process.env.SMTP_FROM} <${process.env.SMTP_FROM_EMAIL}>`,
                 subject: 'Rénitialisation de mot de passe',

@@ -3,7 +3,7 @@ import {createClient} from 'redis';
 
 // Instance directe
 export const redis = createClient({
-    url: process.env.REDIS_URL
+    url: "redis://:development@localhost:6379"
 });
 
 // Gestion des événements

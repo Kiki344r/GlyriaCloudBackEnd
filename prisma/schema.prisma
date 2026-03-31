@@ -13,6 +13,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  ETUDIANT
+  PROFESSEUR
+  ADMINISTRATEUR
+}
+
+enum Permission {
+  READ
+  WRITE
+  MANAGE_MEMBERS
+  MANAGE_PROXIES
+  MANAGE_VMS
+  ADMIN
+}
+
 model Users {
   UUID      String @id @default(uuid(7))
   firstName String
@@ -20,12 +35,19 @@ model Users {
   email     String @unique
   password  String
 
-  // Groupes dont l'utilisateur est membre
-  groups Groups[] @relation("UserGroups")
+  groups         UserGroupPermissions[]
+  ownedGroups    Groups[]               @relation("GroupOwner")
+  forgotPassword forgotPassword[]       @relation("UserEmail")
+  validateEmail  validateEmail[]        @relation("UserEmailValidation")
+}
 
-  // Groupes que l'utilisateur possède
-  ownedGroups    Groups[]         @relation("GroupOwner")
-  forgotPassword forgotPassword[] @relation("UserEmail")
+model validateEmail {
+  UUID      String   @id @default(uuid(7))
+  createdAt DateTime @default(now())
+  expireAt  DateTime
+
+  userEmail String
+  user      Users  @relation("UserEmailValidation", fields: [userEmail], references: [email])
 }
 
 model forgotPassword {
@@ -41,13 +63,38 @@ model Groups {
   UUID String @id @default(uuid(7))
   name String
 
-  // Owner du groupe
   ownerId String
   owner   Users  @relation("GroupOwner", fields: [ownerId], references: [UUID])
 
-  // Users membres
-  users     Users[]    @relation("UserGroups")
-  GroupCode GroupCode?
+  members                UserGroupPermissions[]
+  GroupCode              GroupCode?
+  defaultRolePermissions DefaultRolePermission[]
+}
+
+model UserGroupPermissions {
+  UUID     String   @id @default(uuid(7))
+  joinedAt DateTime @default(now())
+
+  userId String
+  user   Users  @relation(fields: [userId], references: [UUID])
+
+  groupId String
+  group   Groups @relation(fields: [groupId], references: [UUID])
+
+  permissions GroupPermission[]
+  role        Role              @default(ETUDIANT)
+
+  @@unique([userId, groupId]) // un user = une entrée par groupe
+}
+
+model GroupPermission {
+  UUID       String     @id @default(uuid(7))
+  permission Permission
+
+  membershipId String
+  membership   UserGroupPermissions @relation(fields: [membershipId], references: [UUID])
+
+  @@unique([membershipId, permission]) // pas de doublon de permission
 }
 
 model GroupCode {
@@ -55,4 +102,15 @@ model GroupCode {
   code    String @unique // le code du groupe
   group   Groups @relation(fields: [groupId], references: [UUID])
   groupId String @unique // un code = un groupe
+}
+
+model DefaultRolePermission {
+  UUID       String     @id @default(uuid(7))
+  role       Role
+  permission Permission
+
+  groupId String
+  group   Groups @relation(fields: [groupId], references: [UUID])
+
+  @@unique([role, permission]) // pas de doublon de permission pour un rôle
 }

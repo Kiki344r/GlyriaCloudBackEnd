@@ -2,7 +2,8 @@ import { RouteConfig} from "@/versions/routesManager";
 import {prisma} from "@/config";
 import bcrypt from "bcrypt"
 
-const jwt = require("jsonwebtoken")
+import {useAccount} from "@/versions/v1/services";
+const {getUserInfoCached, loginUser, getUserInfo} = useAccount()
 
 export default {
     method: 'POST',
@@ -16,7 +17,8 @@ export default {
 
             if (!email || !password) return res.status(400).json({success: false, message: "Des champs sont manquants !"})
 
-            const UserInformation = await prisma.users.findUnique({where: {email: email}, include: {groups: true}})
+            const UserInformation = await getUserInfo(email, {includePassword: true, includeValidateEmail: true})
+
             if (!UserInformation) return res.status(401).json({
                 success: false,
                 message: "Email ou mot de passe incorrect !"
@@ -25,21 +27,12 @@ export default {
             const passwordMatch = await bcrypt.compare(password, UserInformation.password)
             if (!passwordMatch) return res.status(401).json({success: false, message: "Email ou mot de passe incorrect !"})
 
-            const userData = {
-                firstName: UserInformation.firstName,
-                lastName: UserInformation.lastName,
-                email: UserInformation.email,
-                groups: UserInformation.groups,
-                UUID: UserInformation.UUID
-            }
+            if (UserInformation.validateEmail.length > 0) return res.status(401).json({
+                success: false,
+                message: "Veuillez valider votre adresse mail !"
+            })
 
-            const JWT_Token = await jwt.sign(userData, process.env?.JWT_SECRET, {expiresIn: '3d'})
-
-            if (remember) {
-                res.cookie("token", JWT_Token, {maxAge: 3 * 24 * 60 * 60 * 1000, httpOnly: true})
-            } else {
-                res.cookie("token", JWT_Token, {httpOnly: true})
-            }
+            const userData = await loginUser(res, email, remember)
 
             return res.status(200).json({
                 success: true,

@@ -25,7 +25,7 @@ export default {
 
             if (!groupCheck) return res.status(404).json({success: false, message: "Ce groupe n'existe pas !"})
 
-            const {email} = req.userData!
+            const {email, UUID: userId} = req.userData!
 
             const userGroup = await prisma.users.findUnique({
                 where: {
@@ -34,7 +34,7 @@ export default {
                 select: {
                     groups: {
                         where: {
-                            UUID: groupCheck.UUID
+                            groupId: groupId
                         }
                     }
                 }
@@ -45,15 +45,11 @@ export default {
                 message: "Vous ne faites pas partie de ce groupe !"
             })
 
-            await prisma.users.update({
+            await prisma.userGroupPermissions.delete({
                 where: {
-                    email: email
-                },
-                data: {
-                    groups: {
-                        disconnect: {
-                            UUID: groupCheck.UUID
-                        }
+                    userId_groupId: {
+                        userId: userId,
+                        groupId: groupId
                     }
                 }
             })
