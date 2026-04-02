@@ -67,7 +67,6 @@ export function useProxmox() {
     const getVNCWebsocketURL = async (node: string, vmid: number) => {
         const proxy = await getVNCProxy(node, vmid);
         // proxy = { ticket, port, cert, upid }
-
         const params = new URLSearchParams({
             port: proxy.port,
             vncticket: proxy.ticket,

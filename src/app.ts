@@ -1,16 +1,18 @@
-import {WebSocket, WebSocketServer} from "ws";
-import { Client } from 'ssh2';
+import WebSocketHandler from "@/versions/v1/websocket";
 
 console.log("Loading API")
 
+import {WebSocketServer} from "ws";
 import express from "express";
 import apiRouter from "./index";
 import cors from "cors";
-import net from 'net'
+import {IncomingMessage} from "http";
+import {Socket} from "net";
 
 const cookieParser = require('cookie-parser')
 
 const app = express();
+const httpServer = require('http').createServer(app);
 
 const allowedOrigins = [
     "http://localhost:3000",       // dev
@@ -37,8 +39,20 @@ app.use(cookieParser())
 app.use("/", apiRouter);
 
 const PORT = process.env.PORT || 3100;
-export const server = app.listen(PORT, () => {
+export const server = httpServer.listen(PORT, () => {
     console.log(`✅ API server running on port ${PORT}`);
+});
+
+
+export const web_socket_server = new WebSocketServer({noServer: true});
+web_socket_server.on('connection', WebSocketHandler)
+// @ts-ignore
+server.on('upgrade', (request: IncomingMessage, socket: Socket, head: Buffer) => {
+    // Tu peux filtrer l'URL ici si tu veux (ex: seulement si request.url commence par /terminal)
+    web_socket_server.handleUpgrade(request, socket, head, (ws) => {
+        web_socket_server.emit('connection', ws, request);
+    });
+
 });
 
 //const API_TOKEN = "PVEAPIToken=root@pam!glyria-cloud=d55d1528-0e9b-481a-8c55-17d8a8cf3de6"
