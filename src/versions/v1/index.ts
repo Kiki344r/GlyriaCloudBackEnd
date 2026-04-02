@@ -5,9 +5,6 @@ import axios from 'axios';
 import https from 'https';
 import { IncomingMessage } from 'http';
 
-import init from "./websocket/index"
-init()
-
 const router: Router = express.Router();
 const AuthRoute: Router = express.Router();
 const GroupRoute: Router = express.Router();
