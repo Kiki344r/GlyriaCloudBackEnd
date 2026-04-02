@@ -123,7 +123,7 @@ export function useAccount() {
         if (remember) {
             res.cookie("token", JWT_Token, {maxAge: 3 * 24 * 60 * 60 * 1000, httpOnly: true})
         } else {
-            res.cookie("token", JWT_Token, {httpOnly: true, sameSite: 'none'})
+            res.cookie("token", JWT_Token, {httpOnly: true})
         }
 
         return userData
