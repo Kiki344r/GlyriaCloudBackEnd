@@ -12,16 +12,10 @@ export default {
     handler: async (req, res) => {
         try {
 
-            const {node, vmid} = req.params;
+            const {node, vmid} = req.params
             if (!node || !vmid) return res.status(400).json({success: false, message: "Des champs sont manquants !"})
 
             const {url, ticket } = await getVNCWebsocketURL(node, parseInt(vmid))
-
-            res.cookie('PVEAuthCookie', ticket, {
-                sameSite: 'none',
-                secure: true,
-                path: '/'
-            })
 
             return res.status(200).json({
                 success: true,

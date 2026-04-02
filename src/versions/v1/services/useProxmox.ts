@@ -50,6 +50,13 @@ export function useProxmox() {
         });
     };
 
+    // Reboot une VM
+    const rebootVM = async (node: string, vmid: number) => {
+        return await api(`/nodes/${node}/qemu/${vmid}/status/reboot`, {
+            method: 'POST',
+        });
+    }
+
     // Shutdown propre
     const shutdownVM = async (node: string, vmid: number) => {
         return await api(`/nodes/${node}/qemu/${vmid}/status/shutdown`, {
@@ -89,6 +96,7 @@ export function useProxmox() {
         getVM,
         startVM,
         stopVM,
+        rebootVM,
         shutdownVM,
         getVNCProxy,
         getVNCWebsocketURL,
