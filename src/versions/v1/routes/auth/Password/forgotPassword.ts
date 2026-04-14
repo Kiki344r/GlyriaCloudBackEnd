@@ -19,7 +19,7 @@ export default {
 
             const passwordLink = await prisma.forgotPassword.create({
                 data: {
-                    userEmail: email,
+                    userId: user.UUID,
                     expireAt: new Date(Date.now() + 30*60*1000)
                 }
             })

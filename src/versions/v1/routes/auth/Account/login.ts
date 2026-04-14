@@ -27,7 +27,7 @@ export default {
             const passwordMatch = await bcrypt.compare(password, UserInformation.password)
             if (!passwordMatch) return res.status(401).json({success: false, message: "Email ou mot de passe incorrect !"})
 
-            if (UserInformation.validateEmail.length > 0) return res.status(401).json({
+            if (UserInformation.emailValidations.length > 0) return res.status(401).json({
                 success: false,
                 message: "Veuillez valider votre adresse mail !"
             })

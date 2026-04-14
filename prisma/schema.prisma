@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,19 +7,13 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  ETUDIANT
-  PROFESSEUR
-  ADMINISTRATEUR
-}
-
 enum Permission {
-  READ
-  WRITE
+  EXERCISES
+  MANAGE_EXERCISES
   MANAGE_MEMBERS
-  MANAGE_PROXIES
-  MANAGE_VMS
-  ADMIN
+  MANAGE_CODES
+  MANAGE_ROLES
+  MANAGE_SETTINGS
 }
 
 model Users {
@@ -35,28 +23,29 @@ model Users {
   email     String @unique
   password  String
 
-  groups         UserGroupPermissions[]
-  ownedGroups    Groups[]               @relation("GroupOwner")
-  forgotPassword forgotPassword[]       @relation("UserEmail")
-  validateEmail  validateEmail[]        @relation("UserEmailValidation")
+  groups      UserGroupPermissions[]
+  ownedGroups Groups[]               @relation("GroupOwner")
+
+  emailValidations EmailValidation[]
+  passwordResets   ForgotPassword[]
 }
 
-model validateEmail {
+model EmailValidation {
   UUID      String   @id @default(uuid(7))
   createdAt DateTime @default(now())
   expireAt  DateTime
 
-  userEmail String
-  user      Users  @relation("UserEmailValidation", fields: [userEmail], references: [email])
+  userId String
+  user   Users  @relation(fields: [userId], references: [UUID], onDelete: Cascade)
 }
 
-model forgotPassword {
+model ForgotPassword {
   UUID      String   @id @default(uuid(7))
   createdAt DateTime @default(now())
   expireAt  DateTime
 
-  userEmail String
-  user      Users  @relation("UserEmail", fields: [userEmail], references: [email])
+  userId String
+  user   Users  @relation(fields: [userId], references: [UUID], onDelete: Cascade)
 }
 
 model Groups {
@@ -66,9 +55,12 @@ model Groups {
   ownerId String
   owner   Users  @relation("GroupOwner", fields: [ownerId], references: [UUID])
 
-  members                UserGroupPermissions[]
-  GroupCode              GroupCode?
-  defaultRolePermissions DefaultRolePermission[]
+  members UserGroupPermissions[]
+  codes   GroupCode[]
+  roles   GroupRoles[]
+
+  defaultRoleId String?
+  defaultRole   GroupRoles? @relation("DefaultRole", fields: [defaultRoleId], references: [UUID])
 }
 
 model UserGroupPermissions {
@@ -76,41 +68,49 @@ model UserGroupPermissions {
   joinedAt DateTime @default(now())
 
   userId String
-  user   Users  @relation(fields: [userId], references: [UUID])
+  user   Users  @relation(fields: [userId], references: [UUID], onDelete: Cascade)
 
   groupId String
-  group   Groups @relation(fields: [groupId], references: [UUID])
+  group   Groups @relation(fields: [groupId], references: [UUID], onDelete: Cascade)
 
-  permissions GroupPermission[]
-  role        Role              @default(ETUDIANT)
+  roleId String
+  role   GroupRoles @relation(fields: [roleId], references: [UUID])
 
-  @@unique([userId, groupId]) // un user = une entrée par groupe
+  @@unique([userId, groupId])
 }
 
-model GroupPermission {
-  UUID       String     @id @default(uuid(7))
+model GroupRoles {
+  UUID String @id @default(uuid(7))
+  name String
+
+  groupId String
+  group   Groups @relation(fields: [groupId], references: [UUID], onDelete: Cascade)
+
+  permissions GroupsRolesPermissions[]
+  members     UserGroupPermissions[]
+
+  defaultFor Groups[] @relation("DefaultRole")
+}
+
+model GroupsRolesPermissions {
+  UUID String @id @default(uuid(7))
+
+  roleId String
+  role   GroupRoles @relation(fields: [roleId], references: [UUID], onDelete: Cascade)
+
   permission Permission
 
-  membershipId String
-  membership   UserGroupPermissions @relation(fields: [membershipId], references: [UUID])
-
-  @@unique([membershipId, permission]) // pas de doublon de permission
+  @@unique([roleId, permission])
 }
 
 model GroupCode {
-  UUID    String @id @default(uuid(7))
-  code    String @unique // le code du groupe
-  group   Groups @relation(fields: [groupId], references: [UUID])
-  groupId String @unique // un code = un groupe
-}
+  UUID String @id @default(uuid(7))
 
-model DefaultRolePermission {
-  UUID       String     @id @default(uuid(7))
-  role       Role
-  permission Permission
-
+  code    String @unique
   groupId String
-  group   Groups @relation(fields: [groupId], references: [UUID])
+  group   Groups @relation(fields: [groupId], references: [UUID], onDelete: Cascade)
 
-  @@unique([role, permission]) // pas de doublon de permission pour un rôle
+  createdAt DateTime @default(now())
+
+  @@unique([groupId, code])
 }

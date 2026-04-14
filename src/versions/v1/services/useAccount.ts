@@ -58,7 +58,7 @@ export function useAccount() {
                         group: true
                     }
                 } : undefined,
-                validateEmail: includeValidateEmail ? true : undefined
+                emailValidations: includeValidateEmail ? true : undefined
             }
         })
 
@@ -79,7 +79,7 @@ export function useAccount() {
             return false
         }
 
-        await prisma.users.create({
+        const userCreated = await prisma.users.create({
             data: {
                 email: email,
                 password: hashedPassword,
@@ -90,9 +90,9 @@ export function useAccount() {
 
         const userFullName = `${firstName} ${lastName}`
 
-        const validateEmail = await prisma.validateEmail.create({
+        const validateEmail = await prisma.emailValidation.create({
             data: {
-                userEmail: email,
+                userId: userCreated.UUID,
                 expireAt: new Date(Date.now() + 24*60*60*1000)
             }
         })

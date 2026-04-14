@@ -14,7 +14,7 @@ export default {
             const {token} = req.body
             if (!token) return res.status(400).json({success: false, message: "Des champs sont manquants !"})
 
-            const validateEmail = await prisma.validateEmail.findUnique({
+            const validateEmail = await prisma.emailValidation.findUnique({
                 where: {UUID: token},
                 include: {
                     user: {
@@ -26,7 +26,7 @@ export default {
             })
             if (!validateEmail) return res.status(404).json({success: false, message: "Ce lien n'est plus valide !"})
 
-            await prisma.validateEmail.delete({where: {UUID: token}})
+            await prisma.emailValidation.delete({where: {UUID: token}})
 
             if (validateEmail.expireAt < new Date()) return res.status(410).json({success: false, message: 'Le lien de vérification de l\'email a expiré !'})
 

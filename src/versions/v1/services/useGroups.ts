@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken")
 export function useGroups() {
 
     const checkGroupCode = async (code: string) => {
-        const codeCheck = await prisma.groupCode.findUnique({
+        const codeCheck = await prisma.groupCode.findMany({
             where: {
                 code: code
             },
@@ -16,7 +16,7 @@ export function useGroups() {
                 code: true
             }
         })
-        return !!codeCheck
+        return !!codeCheck[0]
     }
 
     const joinGroup = async (email: string) => {

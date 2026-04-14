@@ -23,7 +23,7 @@ export default {
 
             const user = await prisma.users.update({
                 where: {
-                    email: passwordCode.userEmail
+                    UUID: passwordCode.userId
                 },
                 data: {
                     password: hashedPassword

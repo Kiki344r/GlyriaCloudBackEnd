@@ -18,7 +18,7 @@ export default {
 
             const codeCheck = await prisma.groupCode.findUnique({
                 where: {
-                    code: code
+                    code
                 },
                 select: {
                     group: true,
@@ -27,8 +27,7 @@ export default {
                 }
             })
 
-
-            if (!codeCheck) return res.status(404).json({success: false, message: "Ce code n'existe pas !"})
+            if (!codeCheck || !codeCheck) return res.status(404).json({success: false, message: "Ce code n'existe pas !"})
 
             const {email, UUID: userId} = req.userData!
 
@@ -50,10 +49,24 @@ export default {
                 message: "Vous faites déjà partie de ce groupe !"
             })
 
+            if (!codeCheck.group.defaultRoleId) {
+                return res.status(409).json({
+                    success: false,
+                    message: "Le groupe ne possède pas de rôle par défaut, veuillez contacter l'administrateur du groupe !"
+                })
+            }
+
             await prisma.userGroupPermissions.create({
                 data: {
                     userId: userId,
-                    groupId: codeCheck.groupId
+                    groupId: codeCheck.groupId,
+                    roleId: codeCheck.group.defaultRoleId
+                }
+            })
+
+            await prisma.groupCode.delete({
+                where: {
+                    code: codeCheck.code
                 }
             })
 
