@@ -8,13 +8,29 @@ datasource db {
 }
 
 enum Permission {
-  EXERCISES
-  MANAGE_EXERCISES
+  VMS
+  MODULES
+  MANAGE_VMS
+  MANAGE_MODULES
   MANAGE_MEMBERS
   MANAGE_CODES
   MANAGE_ROLES
   MANAGE_SETTINGS
+  ADMINISTRATOR
 }
+
+enum VmType {
+  LYCEE
+  LOCAL
+}
+
+enum ModuleItemType {
+  TP
+  COURS
+  EXERCICE
+}
+
+// ─── Modèles existants ────────────────────────────────────────────────────────
 
 model Users {
   UUID      String @id @default(uuid(7))
@@ -28,6 +44,9 @@ model Users {
 
   emailValidations EmailValidation[]
   passwordResets   ForgotPassword[]
+
+  vms       GroupVm[]
+  linkedVms ModuleVmLink[]
 }
 
 model EmailValidation {
@@ -61,6 +80,9 @@ model Groups {
 
   defaultRoleId String?
   defaultRole   GroupRoles? @relation("DefaultRole", fields: [defaultRoleId], references: [UUID])
+
+  modules GroupModule[]
+  vms     GroupVm[]
 }
 
 model UserGroupPermissions {
@@ -113,4 +135,135 @@ model GroupCode {
   createdAt DateTime @default(now())
 
   @@unique([groupId, code])
+}
+
+// ─── Nouveaux modèles ─────────────────────────────────────────────────────────
+
+model GroupModule {
+  UUID        String  @id @default(uuid(7))
+  name        String
+  description String? @db.Text
+  requiresVm  Boolean @default(false)
+
+  groupId String
+  group   Groups @relation(fields: [groupId], references: [UUID], onDelete: Cascade)
+
+  items   GroupModuleItem[]
+  vmLinks ModuleVmLink[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model GroupModuleItem {
+  UUID    String         @id @default(uuid(7))
+  title   String
+  type    ModuleItemType
+  content String         @db.LongText
+  order   Int            @default(0)
+
+  moduleId String
+  module   GroupModule @relation(fields: [moduleId], references: [UUID], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model GroupVm {
+  UUID String @id @default(uuid(7))
+  name String
+  type VmType
+
+  // Champs LYCEE
+  nodeId String?
+  node   PVENodes? @relation(fields: [nodeId], references: [UUID], onDelete: Cascade)
+  vmid   Int?
+  os     String?
+
+  // Champs LOCAL
+  ip      String?
+  sshPort Int?
+  rdpPort Int?
+
+  groupId String
+  group   Groups @relation(fields: [groupId], references: [UUID], onDelete: Cascade)
+
+  userId String
+  user   Users  @relation(fields: [userId], references: [UUID], onDelete: Cascade)
+
+  proxies VmProxy[]
+  vmLinks ModuleVmLink[]
+
+  createdAt DateTime @default(now())
+}
+
+model VmProxy {
+  UUID         String  @id @default(uuid(7))
+  internalPort Int
+  exposedIp    String
+  exposedPort  Int
+  description  String?
+
+  vmId String
+  vm   GroupVm @relation(fields: [vmId], references: [UUID], onDelete: Cascade)
+
+  usedPort UsedPort?
+
+  createdAt DateTime @default(now())
+
+  @@unique([vmId, internalPort])
+}
+
+model ModuleVmLink {
+  UUID String @id @default(uuid(7))
+
+  moduleId String
+  module   GroupModule @relation(fields: [moduleId], references: [UUID], onDelete: Cascade)
+
+  vmId String
+  vm   GroupVm @relation(fields: [vmId], references: [UUID], onDelete: Cascade)
+
+  userId String
+  user   Users  @relation(fields: [userId], references: [UUID], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([moduleId, userId])
+}
+
+model PortRange {
+  UUID     String  @id @default(uuid(7))
+  fromPort Int
+  toPort   Int
+  label    String?
+  ip       String
+
+  createdAt DateTime @default(now())
+
+  @@unique([ip, fromPort])
+}
+
+model UsedPort {
+  UUID String @id @default(uuid(7))
+  port Int
+  ip   String
+
+  vmProxyId String  @unique
+  vmProxy   VmProxy @relation(fields: [vmProxyId], references: [UUID], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([ip, port])
+}
+
+model PVENodes {
+  UUID String @id @default(uuid(7))
+  name String
+
+  maxVMs Int
+  vms    GroupVm[]
+
+  templateId Int
+
+  createdAt DateTime @default(now())
 }
